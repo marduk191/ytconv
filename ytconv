@@ -1,0 +1,44 @@
+#!/bin/bash
+## YTconv Youtube converter
+## By marduk191
+## email: marduk191@gmail.com
+if ! dpkg-query -W yad | grep . 
+then printf "%s\n" "yad isn't installed. Setting up yad." 
+     gksudo apt-get install yad 
+else printf "%s\n" "yad is already installed!"
+fi
+
+frmdata=$(
+	yad --width=400 \
+	 --title="YouTube converter - marduk191" \
+	 --text="Please enter your details:" \
+	 --image="./bin/photo.png" \
+	 --form --date-format="%-d %B %Y" --item-separator="," \
+	 --field="flv folder:DIR" \
+	 --field="VBR/CBR:CB" \
+	 --field "Chose bitrate:CB" \
+	 --button="Convert:2" \
+	 --button="Exit:1" \
+	"." "CBR,VBR" "64k,128k,192k,256k,9,5,2,0" "$bitty" "2" "1")
+
+dirloc=$(printf "%s" "$frmdata" | awk 'BEGIN {FS="|" } { print $1 }')
+vcb=$(printf "%s" "$frmdata" | awk 'BEGIN {FS="|" } { print $2 }')
+bitrate=$(printf "%s" "$frmdata" | awk 'BEGIN {FS="|" } { print $3 }')
+
+ret=$?
+
+[[ $ret -eq 1 ]] && exit 0
+
+
+if [[ "$vcb" == "VBR" ]]; then
+    vcv="-aq"
+elif [[ "$vcb" == "CBR" ]]; then
+      vcv="-ab"
+fi   
+ 
+for i in $( find $dirloc -name "*.flv" )
+do ./bin/ffmpeg -i "$i" "$vcv" "$bitrate" "$i.mp3"
+done
+
+mkdir $dirloc/out
+mv $dirloc/*.mp3 $dirloc/out
