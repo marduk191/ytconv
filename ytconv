@@ -36,9 +36,9 @@ elif [[ "$vcb" == "CBR" ]]; then
       vcv="-ab"
 fi   
  
-for i in $( find $dirloc -name "*.flv" )
+for i in $( find "$dirloc" -name "*.flv" )
 do ./bin/ffmpeg -i "$i" "$vcv" "$bitrate" "$i.mp3"
 done
 
-mkdir $dirloc/out
-mv $dirloc/*.mp3 $dirloc/out
+mkdir "$dirloc"/out
+mv "$dirloc"/*.mp3 "$dirloc"/out
